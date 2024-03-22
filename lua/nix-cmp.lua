@@ -11,39 +11,47 @@ local function last(str)
     return lastWord or ""
 end
 
--- turn a string with a list like
--- [ "foo" "bar" "yo" "lo" ]
--- into a table of tables like
+-- turn a set of strings in to a set compatible with nvim-cmp
+-- { "foo", "bar", "yo", "lo" }
+-- ==>
 -- { { label = "foo"} , ..., { label = "lo" } }
--- This format is expected by nvim-cmp
-local function makeLabels(str)
+local function makeLabels(set)
     local t = {}
-    for item in str:gmatch("\"([^\"]+)\"") do
+    for _, v in pairs(set) do
         local entry = {}
-        entry.label = item
+        entry.label = v
         table.insert(t, entry)
     end
     return t
 end
 
--- Get the name of all builtins of nix into list
-local function get_builtins()
-    local output = vim.fn.system("nix-instantiate --eval -E 'builtins.attrNames builtins'")
+-- Get the keys of a nix attribute set into a lua set of strings
+local function attrNames(set)
+    local cmd = string.format("nix-instantiate --eval -E 'builtins.attrNames %s'", set)
+    local output = vim.fn.system(cmd)
 
     if vim.v.shell_error ~= 0 then
-        print("nix-cmp: nix-instantiate failed")
+        print("nix-cmp: nix-instantiate failed for " .. set)
         return {}
     end
 
     -- Trim leading/trailing spaces and brackets
     output = output:gsub("^%s*%[(.+)%]%s*$", "%1")
 
-    local table_names = makeLabels(output)
-    return table_names
+    local t = {}
+    for name in output:gmatch("\"([^\"]+)\"") do
+        table.insert(t, name)
+    end
+    return t
+end
+
+-- Get the name of all builtins of nix into list
+local function get_builtins()
+    local names = attrNames("builtins")
+    return makeLabels(names)
 end
 
 BuiltinsTable = get_builtins()
-
 
 -- The remainder of this file is file declares a source for nvim-cmp
 -- (see https://github.com/hrsh7th/nvim-cmp)
