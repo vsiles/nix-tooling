@@ -3,12 +3,17 @@
 This is a *source* for the [nvim-cmp](https://github.com/hrsh7th/nvim-cmp)
 plugin to try and provide auto-completion in nix files.
 
+## TODO
+turn this into a proper nvim module so I can install it using lazy
+
 ## Builtins completion
 
-We provide completion for `builtins` based on _syntax_: any time you input
-verbatim `builtins.`, completion will trigger. A future improvement would only
-fire on the "actual" `builtins` (and not e.g. for a function argument named in the
-same way).
+We provide completion for `builtins`, `pkgs` and `lib` (or `pkgs.lib`) based
+on _syntax_: any time you input verbatim `builtins.` or the other triggers,
+completion will fire.
+A future improvement would only fire on the "actual" `builtins`, `pkgs` and
+`lib` (and not e.g. for a function argument named in the same way) and not on
+every verbatim occurrences of them
 
 The list is built at runtime using `nix-instantiate`.
 

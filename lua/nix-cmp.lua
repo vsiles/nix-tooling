@@ -45,13 +45,15 @@ local function attrNames(set)
     return t
 end
 
--- Get the name of all builtins of nix into list
-local function get_builtins()
-    local names = attrNames("builtins")
+-- Get the name of all builtins, pkgs and lib of nix into completion lists
+local function get_compl(set)
+    local names = attrNames(set)
     return makeLabels(names)
 end
 
-BuiltinsTable = get_builtins()
+BuiltinsTable = get_compl("builtins")
+PkgsTable = get_compl("(import <nixpkgs> {})")
+LibTable = get_compl("(import <nixpkgs> {}).lib")
 
 -- The remainder of this file is file declares a source for nvim-cmp
 -- (see https://github.com/hrsh7th/nvim-cmp)
@@ -76,9 +78,12 @@ function source:complete(params, callback)
   local compl_ctxt = params.completion_context
   if compl_ctxt.triggerCharacter then
       local last_word = last(params.context.cursor_line)
-      print("builtins= " .. vim.inspect(BuiltinsTable))
       if last_word == "builtins." then
           callback(BuiltinsTable)
+      elseif last_word == "pkgs." then
+          callback(PkgsTable)
+      elseif last_word == "lib." or last_word == "pkgs.lib." then
+          callback(LibTable)
       end
   end
 end

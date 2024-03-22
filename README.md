@@ -10,5 +10,5 @@ attempt to make things eaiser *for me*
 
 
 - [nix-cmp](./lua/README.md)
-![builtins completion](./resources/nix-builtins.gif)
+![syntactic completion](./resources/nix-cmp.gif)
 
