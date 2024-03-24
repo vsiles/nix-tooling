@@ -52,12 +52,8 @@ cmp.setup.filetype('nix', {
     sources = cmp.config.sources({
       { name = 'nvim_lsp' },
       { name = 'nix-cmp' }
-  }, {
-      { name = 'path' },
+    }, {
       { name = 'buffer' },
-    }),
-    experimental = {
-      ghost_text = true,
-    },
+    })
 })
 ```
