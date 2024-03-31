@@ -4,7 +4,9 @@ This is a *source* for the [nvim-cmp](https://github.com/hrsh7th/nvim-cmp)
 plugin to try and provide auto-completion in nix files.
 
 ## TODO
-turn this into a proper nvim module so I can install it using lazy
+- turn this into a proper nvim module so I can install it using lazy
+- improve perf: things will be loaded on the first completion so that first
+  occurrence can be slow
 
 ## Builtins completion
 

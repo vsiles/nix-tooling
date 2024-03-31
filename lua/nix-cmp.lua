@@ -1,14 +1,9 @@
-local function stringHasSpace(s)
-    return string.find(s, " ") ~= nil
-end
-
--- extract the last word of a string
-local function last(str)
-    if not stringHasSpace(str) then
-        return str
+local function getLastPart(str, separator)
+    local lastPart = nil
+    for part in str:gmatch("[^" .. separator .. "]+") do
+        lastPart = part
     end
-    local lastWord = str:match(".*%s(%S+)$")
-    return lastWord or ""
+    return lastPart
 end
 
 -- turn a set of strings in to a set compatible with nvim-cmp
@@ -55,6 +50,7 @@ end
 local BuiltinsTable = nil
 local PkgsTable = nil
 local LibTable = nil
+local ModuleTypesTable = nil
 
 -- The remainder of this file is file declares a source for nvim-cmp
 -- (see https://github.com/hrsh7th/nvim-cmp)
@@ -78,22 +74,27 @@ end
 function source:complete(params, callback)
   local compl_ctxt = params.completion_context
   if compl_ctxt.triggerCharacter then
-      local last_word = last(params.context.cursor_line)
-      if last_word == "builtins." then
+      local last_word = getLastPart(params.context.cursor_line, ".")
+      if last_word == "builtins" then
           if BuiltinsTable == nil then
               BuiltinsTable = get_compl("builtins")
           end
           callback(BuiltinsTable)
-      elseif last_word == "pkgs." then
+      elseif last_word == "pkgs" then
           if PkgsTable == nil then
               PkgsTable = get_compl("(import <nixpkgs> {})")
           end
           callback(PkgsTable)
-      elseif last_word == "lib." or last_word == "pkgs.lib." then
+      elseif last_word == "lib" then
           if LibTable == nil then
               LibTable = get_compl("(import <nixpkgs> {}).lib")
           end
           callback(LibTable)
+      elseif last_word == "types" then
+          if ModuleTypesTable == nil then
+              ModuleTypesTable = get_compl("(import <nixpkgs> {}).lib.types")
+          end
+          callback(ModuleTypesTable)
       end
   end
 end
