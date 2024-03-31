@@ -51,9 +51,10 @@ local function get_compl(set)
     return makeLabels(names)
 end
 
-BuiltinsTable = get_compl("builtins")
-PkgsTable = get_compl("(import <nixpkgs> {})")
-LibTable = get_compl("(import <nixpkgs> {}).lib")
+-- Lazy loaded when first accessed
+local BuiltinsTable = nil
+local PkgsTable = nil
+local LibTable = nil
 
 -- The remainder of this file is file declares a source for nvim-cmp
 -- (see https://github.com/hrsh7th/nvim-cmp)
@@ -79,10 +80,19 @@ function source:complete(params, callback)
   if compl_ctxt.triggerCharacter then
       local last_word = last(params.context.cursor_line)
       if last_word == "builtins." then
+          if BuiltinsTable == nil then
+              BuiltinsTable = get_compl("builtins")
+          end
           callback(BuiltinsTable)
       elseif last_word == "pkgs." then
+          if PkgsTable == nil then
+              PkgsTable = get_compl("(import <nixpkgs> {})")
+          end
           callback(PkgsTable)
       elseif last_word == "lib." or last_word == "pkgs.lib." then
+          if LibTable == nil then
+              LibTable = get_compl("(import <nixpkgs> {}).lib")
+          end
           callback(LibTable)
       end
   end
